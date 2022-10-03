@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createTheme, makeStyles, withStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
@@ -7,7 +7,7 @@ import MuiDialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import { Box, DialogActions, FormControl, InputLabel, TextField } from '@material-ui/core';
+import { Box, DialogActions, FormControl,TextField } from '@material-ui/core';
 
 import API from "../constants/API-Config";
 
@@ -31,9 +31,6 @@ const styles = (theme) => ({
             //     borderColor: 'orange',
             //   }  
         }
-      },
-      loginBtn:{
-        
       }
 });
 
@@ -69,7 +66,11 @@ const useStyles = makeStyles((theme) => ({
         border: '1px solid #43AFFF', 
         textTransform: 'none', 
         width: '148px', 
-        height: '46px'
+        height: '46px',
+        '&:hover, &:active, &:visited': {
+            backgroundColor: "#43AFFF",
+            border: '1px solid #43AFFF',
+         },
       },
       actionRow:{
         display: 'flex', 
@@ -86,7 +87,7 @@ export default function LoginModal(props) {
     const [passwordError, setPasswordError] = useState('');
     const [responseError, setResponseError] = useState({ code: '', message: '' });
 
-    const handleClose = () => {
+    const handleCloseModal = () => {
             props.onCloseModal(false);
     };
 
@@ -157,8 +158,8 @@ export default function LoginModal(props) {
 
     return (
         <div>
-            <Dialog maxWidth='sm' fullWidth PaperProps={{style:{borderRadius: 20 }}} onClose={handleClose} aria-labelledby="login-dialog-title" open>
-                <DialogTitle id="login-dialog-title" onClose={handleClose}>
+            <Dialog maxWidth='sm' fullWidth PaperProps={{style:{borderRadius: 20 }}} onClose={handleCloseModal} aria-labelledby="login-dialog-title" open>
+                <DialogTitle id="login-dialog-title" onClose={handleCloseModal}>
                     Login
                 </DialogTitle>
                 <DialogContent>

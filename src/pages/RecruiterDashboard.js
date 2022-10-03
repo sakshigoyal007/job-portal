@@ -1,27 +1,59 @@
-import { Box, Button, CircularProgress, Container, Grid, IconButton, Snackbar, SvgIcon, Typography } from '@material-ui/core';
-import { NoteAddOutlined } from '@material-ui/icons';
+import { Box, Button, CircularProgress, Container, Grid, IconButton, Snackbar, Typography, withStyles } from '@material-ui/core';
 import React, { Component } from 'react';
 import CustomPagination from '../components/CustomPagination';
 import HeaderNav from '../components/HeaderNav';
-import JobsCard from '../components/JobsCard';
 import API from '../constants/API-Config';
 import HomeIcon from '@material-ui/icons/Home';
 import DescriptionIcon from '@material-ui/icons/Description';
+import PostedJobs from '../components/PostedJobs';
+
+const styles = theme => ({
+    jobsGrid: {
+        paddingTop: '5px',
+        overflow: 'hidden'
+    },
+    descriptionIcon: {
+        width: '106px',
+        height: '106px',
+        opacity: '0.5',
+        color: 'grey'
+    },
+    postBtn: {
+        borderReadius: '5px',
+        marginTop: '40px',
+        color: '#FFFFFF',
+        backgroundColor: '#43AFFF',
+        textTransform: 'none',
+        width: '148px',
+        height: '46px',
+        '&:hover, &:active': {
+            backgroundColor: "#43AFFF",
+            border: '1px solid #43AFFF',
+        },
+    },
+    note: {
+        color: '#303F60',
+        opacity: '0.8'
+    },
+    notifierCss: {
+        backgroundColor: 'white',
+        height: 'auto',
+        lineHeight: '28px',
+        whiteSpace: 'pre-line'
+    }
+});
 
 class RecruiterDashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loggedInUser: '',
             currentPage: 1,
             authToken: '',
             jobsRecord: [],
             totalCount: 0,
-            pageLimit: 20,
-
             numberOfPages: 1,
             isLoading: false,
-            showSnackBar: false,
+            showNotifier: false,
         }
     }
 
@@ -32,9 +64,9 @@ class RecruiterDashboard extends Component {
             window.location.href = '/';
         }
         if (window.location.search.includes('loggedIn=true')) {
-            this.setState({ showSnackBar: true });
+            this.setState({ showNotifier: true });
         }
-        this.setState({ loggedInUser: user, authToken: user.token }, () => {
+        this.setState({ authToken: user.token }, () => {
             this.getPostedJobs();
         })
     }
@@ -64,22 +96,21 @@ class RecruiterDashboard extends Component {
                     isLoading: false,
                     jobsRecord: result.data.data,
                     totalCount: result.data.metadata.count,
-                    pageLimit: result.data.metadata.limit,
                     numberOfPages: totalPages
                 });
             })
             .catch((error) => {
-                return false;
+                console.log(error);
             });
     }
 
-    handleCloseSnackBar = () => {
-        this.setState({showSnackBar:false});
+    handleCloseNotifier = () => {
+        this.setState({ showNotifier: false });
     };
 
     render() {
         const records = this.state.jobsRecord;
-
+        const { classes } = this.props;
         return (
             <>
                 <HeaderNav />
@@ -97,25 +128,29 @@ class RecruiterDashboard extends Component {
                                 <Grid style={{ paddingTop: '10px' }}>
                                     {
                                         records && records.length > 0 ?
-                                            <Grid container spacing={4} style={{ paddingTop: '5px', overflow: 'hidden' }} justifyContent='flex-start'>
-                                                {Array.from(records).map((job) => (
-                                                    <JobsCard title={job.title} description={job.description} location={job.location} jobId={job.id} />
-                                                ))}
-                                            </Grid>
+                                            <>
+                                                <Grid className={classes.jobsGrid} container spacing={4} justifyContent='flex-start'>
+                                                    {Array.from(records).map((job) => (
+                                                        <PostedJobs key={job.id} title={job.title} description={job.description} location={job.location} jobId={job.id} />
+                                                    ))}
+                                                </Grid>
+                                                <CustomPagination setPage={this.paginationChange}
+                                                    currentPage={this.state.currentPage}
+                                                    totalCount={this.state.totalCount}
+                                                    numberOfPages={this.state.numberOfPages} />
+                                            </>
                                             :
                                             <>
-                                                <Box padding={18} display='flex' alignItems={'center'} flexDirection='column'>
-                                                    <DescriptionIcon style={{ width: '106px', height: '106px', opacity: '0.5', color: 'grey' }} />
-                                                    <Typography style={{ color: '#303F60', opacity: '0.8' }}>Your posted jobs will show here!</Typography>
-                                                    <Button variant='contained' style={{ borderReadius: '5px', marginTop: '40px', color: '#FFFFFF', backgroundColor: '#43AFFF', textTransform: 'none', width: '148px', height: '46px' }} >Post a Job</Button>
+                                                <Box sx={{ pt: 25, pb: 18 }} display='flex' alignItems={'center'} flexDirection='column'>
+                                                    <DescriptionIcon className={classes.descriptionIcon} />
+                                                    <Typography className={classes.note}>Your posted jobs will show here!</Typography>
+                                                    <Button variant='contained' className={classes.postBtn} >Post a Job</Button>
                                                 </Box>
                                             </>
+
                                     }
                                 </Grid>
-                                <CustomPagination setPage={this.paginationChange}
-                                    currentPage={this.state.currentPage}
-                                    totalCount={this.state.totalCount}
-                                    numberOfPages={this.state.numberOfPages} />
+
                             </Container>
                             :
                             <>
@@ -127,19 +162,18 @@ class RecruiterDashboard extends Component {
                     }
                 </Box>
                 {
-                    this.state.showSnackBar &&
+                    this.state.showNotifier &&
                     <Snackbar
-                        style={{ backgroundColor: 'white', height: 'auto', lineHeight: '28px', whiteSpace: 'pre-line' }}
+                        className={classes.notifierCss}
                         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                        onClose={this.handleCloseSnackBar}
+                        onClose={this.handleCloseNotifier}
                         title={'Login'}
                         message={"Login\nYou have successfully logged in"}
                         open
                         action={[
                             <IconButton key={'close'}
                                 aria-label='Close'
-                                color='black'
-                                onClick={this.handleCloseSnackBar}>x</IconButton>
+                                onClick={this.handleCloseNotifier}>x</IconButton>
                         ]}
                     />
                 }
@@ -150,4 +184,4 @@ class RecruiterDashboard extends Component {
     }
 }
 
-export default RecruiterDashboard;
+export default withStyles(styles)(RecruiterDashboard);

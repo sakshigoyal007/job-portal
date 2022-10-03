@@ -1,6 +1,5 @@
-import { AppBar, Box, Button, Card, CardContent, Container, Grid, IconButton, ImageList, ImageListItem, makeStyles, Menu, MenuItem, Snackbar, Toolbar, Tooltip, Typography } from '@material-ui/core';
-import { AccountCircle } from '@material-ui/icons';
-import React, { Component, useEffect, useState } from 'react';
+import { Box, Button, Card, CardContent, Container, Grid, IconButton,makeStyles, Snackbar,Typography } from '@material-ui/core';
+import React, {useEffect, useState } from 'react';
 import HeaderNav from '../components/HeaderNav';
 import { imageData } from '../constants/ImageData';
 
@@ -13,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     hero: {
-        backgroundImage: `url(HomePageImg.png)`,
+        backgroundImage: `url(/images/HomePageImg.png)`,
         height: "395px",
         position: "relative",
         display: "flex",
@@ -59,7 +58,11 @@ const useStyles = makeStyles((theme) => ({
         textTransform: 'none',
         width: '148px',
         height: '46px',
-        marginTop: '-6rem'
+        marginTop: '-6rem',
+        '&:hover, &:active, &:visited': {
+            backgroundColor: "#43AFFF",
+            border: '1px solid #43AFFF',
+         },
     },
     articleTitle: {
         color: '#303F60',
@@ -78,23 +81,30 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex', 
         justifyContent: 'space-around', 
         flexWrap: 'wrap' 
+    },
+    notifier:{
+        backgroundColor: 'white', 
+        height: 'auto', 
+        lineHeight: '28px', 
+        whiteSpace: 'pre-line'
     }
 }));
 
 const HomePage = () => {
     const classes = useStyles();
-    const [showSnackBar,setShowSnackBar]=useState(false);
+    const [notifier,setNotifier]=useState(false);
+
     useEffect(() => {
         let user = JSON.parse(localStorage.getItem('UserInfo'));
         if(user)
             window.location.href='/recruiters';
         if (window.location.search.includes('logout=true')) {
-                setShowSnackBar(true);
+                setNotifier(true);
             }
     }, []);
 
-   const handleCloseSnackBar = () => {
-        setShowSnackBar(false);
+   const handleCloseNotifier = () => {
+        setNotifier(false);
     };
 
     return (
@@ -102,13 +112,11 @@ const HomePage = () => {
             <HeaderNav />
             <Box sx={{ mt: '30px', p: '0 180px' }} display={'flex'} flexDirection='column' justifyContent={'space-around'}>
                 <Box display={'flex'} justifyContent='space-between'>
-                    <Box display={'flex'} flexDirection={'column'} justifyContent='space-evenly' >
+                    <Box display={'flex'} flexWrap='wrap' flexDirection={'column'} justifyContent='space-evenly' >
                         <Typography variant='h4' style={{ color: '#ffffff' }}>Welcome to<br />My<span style={{ color: '#43AFFF' }}>Jobs</span></Typography>
                         <Button variant='contained' className={classes.startBtn}>Get Started</Button>
                     </Box>
-                    <Box className={classes.hero}>
-                        {/* <img style={{maxWidth:'100%', maxHeight:'100%'}} src='HomePageImage.png' alt='image1'/> */}
-                    </Box>
+                    <Box className={classes.hero}/>
                 </Box>
                 <Container className={classes.infoContainer} maxWidth={'lg'}>
                     <Typography className={classes.articleTitle} variant='h5'>Why Us</Typography>
@@ -166,11 +174,11 @@ const HomePage = () => {
                 </Container>
             </Box>
             {
-                    showSnackBar &&
+                    notifier &&
                     <Snackbar
-                        style={{ backgroundColor: 'white', height: 'auto', lineHeight: '28px', whiteSpace: 'pre-line' }}
+                        className={classes.notifier}
                         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                        onClose={handleCloseSnackBar}
+                        onClose={handleCloseNotifier}
                         title={'Login'}
                         message={"Logout\nYou have successfully logged out."}
                         open
@@ -179,7 +187,7 @@ const HomePage = () => {
                              key={'close'}
                                 aria-label='Close'
                                 color='black'
-                                onClick={handleCloseSnackBar}>x</IconButton>
+                                onClick={handleCloseNotifier}>x</IconButton>
                         ]}
                     />
                 }

@@ -1,13 +1,11 @@
 import BaseApi from './BaseApi';
 
-// const ENV = "build";
 const BASEURL=BaseApi.URL;
 
 const API = 
 {
     USER_LOGIN:BASEURL+ "/auth/login",
-    GET_POSTED_JOBS: BASEURL+"/recruiters/jobs",
-    GET_JOB_CANDIDATES: BASEURL+"/",
+    GET_POSTED_JOBS: BASEURL+"/recruiters/jobs"
 }
 
 export default API;

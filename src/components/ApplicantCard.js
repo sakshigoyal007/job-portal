@@ -16,7 +16,7 @@ const ApplicantCard = (props) => {
     const classes = useStyles();
 
     return (
-        <><Grid xs={12} md={6} sm={12} style={{ padding: '5px 5px' }}>
+        <><Grid item xs={12} md={6} sm={12} style={{ padding: '5px 5px' }}>
             <Card className={classes.applicantCard} key={props.applicantId} variant='outlined'>
                 <CardHeader style={{ color: '#303F60' }}
                     avatar={<Avatar style={{ backgroundColor: '#D9EFFF', color: '#303F60' }}>{props.name.charAt(0).toUpperCase()}</Avatar>}

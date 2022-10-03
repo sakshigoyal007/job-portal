@@ -1,10 +1,9 @@
 import { Box, makeStyles } from '@material-ui/core';
 import { Pagination } from '@material-ui/lab';
 import React from 'react';
+
 const useStyles=makeStyles((theme)=>({
     pageContainer:{
-        // position:'fixed',
-        // bottom:0,
         zIndex:200,
         padding:'10px 80px',
         width:'100%'

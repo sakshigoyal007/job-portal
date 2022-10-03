@@ -1,6 +1,5 @@
-import { Box, Button, CircularProgress, Container, Dialog, DialogActions, DialogContent, Grid, IconButton, makeStyles, TextField, Typography, withStyles } from '@material-ui/core';
-import { NoteAddOutlined } from '@material-ui/icons';
-import React, { Component, useEffect, useState } from 'react';
+import { Box, CircularProgress, Container, Dialog, DialogContent, Grid, IconButton, makeStyles, Typography, withStyles } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
 import API from '../constants/API-Config';
 import ApplicantCard from './ApplicantCard';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
@@ -11,8 +10,8 @@ const styles = (theme) => ({
     applicantTitle: {
         margin: 0,
         padding: theme.spacing(2),
-        paddingBottom:'0px',
-        color:'#303F60'
+        paddingBottom: '0px',
+        color: '#303F60'
     },
     closeButton: {
         position: 'absolute',
@@ -32,35 +31,52 @@ const DialogTitle = withStyles(styles)((props) => {
                     <CloseIcon />
                 </IconButton>
             ) : null}
-            <hr/>
+            <hr />
         </MuiDialogTitle>
     );
 });
 
-const useStyles=makeStyles((theme)=>({
-    content:{
-        backgroundColor:theme.palette.grey[200],
-        paddingTop:theme.spacing(1),
-        borderRadius:theme.spacing(1),
-        marginBottom:theme.spacing(2)
+const useStyles = makeStyles((theme) => ({
+    content: {
+        backgroundColor: theme.palette.grey[200],
+        paddingTop: theme.spacing(1),
+        borderRadius: theme.spacing(1),
+        marginBottom: theme.spacing(2)
+    },
+    applicantCountLine: {
+        color: '#303F60',
+        paddingLeft: '1.8rem',
+        fontSize: '15px'
+    },
+    emptyIcon: {
+        width: '106px',
+        height: '106px',
+        opacity: '0.5',
+        color: 'grey'
+    },
+    modalNote: {
+        color: '#303F60',
+        opacity: '0.8'
+    },
+    loader: {
+        color: '#43AFFF'
     }
 }))
 
 
 const ApplicantsModal = (props) => {
+    const classes = useStyles();
+
     const [totalCount, setTotalCount] = useState(0);
     const [applicantsRecord, setApplicantsRecord] = useState([]);
-    const [isLoading,setisLoading]=useState(false);
-    let authToken='';
-    const classes=useStyles();
+    const [isLoading, setisLoading] = useState(false);
+    let authToken = '';
 
-    const handleClose=()=>props.onCloseModal(false);
-
+    const handleCloseModal = () => props.onCloseModal(false);
 
     useEffect(() => {
         let user = JSON.parse(localStorage.getItem('UserInfo'));
-        console.log(user);
-        authToken=user.token; 
+        authToken = user.token;
         setisLoading(true);
         let apiUrl = API.GET_POSTED_JOBS + `/${props.jobId}/candidates`;
         fetch(apiUrl, {
@@ -74,73 +90,72 @@ const ApplicantsModal = (props) => {
         })
             .then((response) => response.json())
             .then((result) => {
-                console.log(result);
-                if(result.success){
-                setisLoading(false);
-                setApplicantsRecord(result.data);
-                setTotalCount(result.data.length);
+                if (result.success) {
+                    setisLoading(false);
+                    setApplicantsRecord(result.data);
+                    setTotalCount(result.data.length);
                 }
             })
             .catch((error) => {
                 console.log("Err", error);
             });
-    },[]);
+    }, []);
 
 
     return (
         <div>
-            <Dialog maxWidth='sm' fullWidth onClose={handleClose} aria-labelledby="customized-dialog-title" open={open}>
-                <DialogTitle id="customized-dialog-title" onClose={handleClose}>
+            <Dialog maxWidth='sm' fullWidth onClose={handleCloseModal} aria-labelledby="applicants-dialog-title" open>
+                <DialogTitle id="applicants-dialog-title" onClose={handleCloseModal}>
                     Applicants for this job
                 </DialogTitle>
                 {
-                    !isLoading ? 
-                    <>
-                <Typography variant='body1' style={{color:'#303F60', paddingLeft:'1.8rem', fontSize:'15px'}}>
-                    
-                    {
-                         applicantsRecord && applicantsRecord.length >0 ?
-                         `Total ${totalCount} applicants`
-                        : `0 applications`
-                    }
-                    </Typography>
-                <DialogContent>
-                
-                <Container className={classes.content}>
-                    <Box
-                        component="form"
-                        noValidate
-                        autoComplete="off"
-                    >
-                       <Grid style={{paddingBottom:'22px'}}>
-                        {
-                            applicantsRecord && applicantsRecord.length >0 ?
-                            <Grid container spacing={4} justifyContent='space-between'>
-                                {Array.from(applicantsRecord).map((applicant) => (
-                                     <ApplicantCard name={applicant.name} email={applicant.email} skills={applicant.skills} applicantId={applicant.id} />
-                                ))}
-                                </Grid>
-                                :
-                                <>
-                                    <Box padding={18} display='flex' alignItems={'center'} flexDirection='column'>
-                                        <AssignmentIcon style={{width:'106px', height:'106px', opacity:'0.5', color:'grey'}}/>
-                                        <Typography style={{color:'#303F60', opacity:'0.8'}}>No applications available!</Typography>
-                                    </Box>
-                                </>
-                        }
-                    </Grid>
-                    </Box>
-                    </Container>
-                </DialogContent>
-                </>
-                : 
-                <>
-                <Box padding={18} display='flex' alignItems={'center'} flexDirection='column'>
-                <CircularProgress size={50} style={{color:'#43AFFF'}}/>
-                </Box>
-            </>
+                    !isLoading ?
+                        <>
+                            <Typography variant='body1' className={classes.applicantCountLine}>
 
-                    }
+                                {
+                                    applicantsRecord && applicantsRecord.length > 0 ?
+                                        `Total ${totalCount} applicants`
+                                        : `0 applications`
+                                }
+                            </Typography>
+                            <DialogContent>
+
+                                <Container className={classes.content}>
+                                    <Box
+                                        component="form"
+                                        noValidate
+                                        autoComplete="off"
+                                    >
+                                        <Grid style={{ paddingBottom: '22px' }}>
+                                            {
+                                                applicantsRecord && applicantsRecord.length > 0 ?
+                                                    <Grid container spacing={4} justifyContent='space-between'>
+                                                        {Array.from(applicantsRecord).map((applicant) => (
+                                                            <ApplicantCard key={applicant.id} name={applicant.name} email={applicant.email} skills={applicant.skills} applicantId={applicant.id} />
+                                                        ))}
+                                                    </Grid>
+                                                    :
+                                                    <>
+                                                        <Box padding={18} display='flex' alignItems={'center'} flexDirection='column'>
+                                                            <AssignmentIcon className={classes.emptyIcon} />
+                                                            <Typography className={classes.modalNote} >No applications available!</Typography>
+                                                        </Box>
+                                                    </>
+                                            }
+                                        </Grid>
+                                    </Box>
+                                </Container>
+                            </DialogContent>
+                        </>
+                        :
+                        <>
+                            <Box padding={18} display='flex' alignItems={'center'} flexDirection='column'>
+                                <CircularProgress size={50} className={classes.loader} />
+                            </Box>
+                        </>
+
+                }
             </Dialog>
         </div>
     )
