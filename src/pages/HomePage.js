@@ -1,6 +1,6 @@
-import { AppBar, Box, Button, Card, CardContent, Container, Grid, IconButton, ImageList, ImageListItem, makeStyles, Menu, MenuItem, Toolbar, Tooltip, Typography } from '@material-ui/core';
+import { AppBar, Box, Button, Card, CardContent, Container, Grid, IconButton, ImageList, ImageListItem, makeStyles, Menu, MenuItem, Snackbar, Toolbar, Tooltip, Typography } from '@material-ui/core';
 import { AccountCircle } from '@material-ui/icons';
-import React, { Component, useEffect } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import HeaderNav from '../components/HeaderNav';
 import { imageData } from '../constants/ImageData';
 
@@ -83,11 +83,19 @@ const useStyles = makeStyles((theme) => ({
 
 const HomePage = () => {
     const classes = useStyles();
+    const [showSnackBar,setShowSnackBar]=useState(false);
     useEffect(() => {
         let user = JSON.parse(localStorage.getItem('UserInfo'));
         if(user)
             window.location.href='/recruiters';
+        if (window.location.search.includes('logout=true')) {
+                setShowSnackBar(true);
+            }
     }, []);
+
+   const handleCloseSnackBar = () => {
+        setShowSnackBar(false);
+    };
 
     return (
         <>
@@ -157,6 +165,24 @@ const HomePage = () => {
 
                 </Container>
             </Box>
+            {
+                    showSnackBar &&
+                    <Snackbar
+                        style={{ backgroundColor: 'white', height: 'auto', lineHeight: '28px', whiteSpace: 'pre-line' }}
+                        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        onClose={handleCloseSnackBar}
+                        title={'Login'}
+                        message={"Logout\nYou have successfully logged out."}
+                        open
+                        action={[
+                            <IconButton
+                             key={'close'}
+                                aria-label='Close'
+                                color='black'
+                                onClick={handleCloseSnackBar}>x</IconButton>
+                        ]}
+                    />
+                }
         </>
     );
 }

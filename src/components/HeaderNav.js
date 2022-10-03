@@ -45,7 +45,7 @@ const HeaderNav = () => {
         // handleCloseUserMenu();  
         localStorage.removeItem('UserInfo');
         setSnackBarState({ open: true, msg: 'Logout success!' });
-        window.location.href = '/';
+        window.location.href = '/?logout=true';
 
     }
 
