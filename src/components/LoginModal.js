@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { createTheme, makeStyles, withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import { Box, DialogActions, FormControl, Grid, TextField } from '@material-ui/core';
+import { Box, DialogActions, FormControl, InputLabel, TextField } from '@material-ui/core';
 
 import API from "../constants/API-Config";
 
@@ -22,8 +21,23 @@ const styles = (theme) => ({
         right: theme.spacing(1),
         top: theme.spacing(1),
         color: theme.palette.grey[500],
-    }
+    },
+    cssOutlinedInput: {
+        '& .MuiOutlinedInput-root': {
+            '&.Mui-focused fieldset': {
+                borderColor: 'green',
+              },
+            // .Mui-focused .MuiOutlinedInput-notchedOutline': {
+            //     borderColor: 'orange',
+            //   }  
+        }
+      },
+      loginBtn:{
+        
+      }
 });
+
+
 
 const DialogTitle = withStyles(styles)((props) => {
     const { children, classes, onClose, ...other } = props;
@@ -45,63 +59,36 @@ const DialogContent = withStyles((theme) => ({
     },
 }))(MuiDialogContent);
 
-// const DialogActions = withStyles((theme) => ({
-//     root: {
-//         margin: 0,
-//         padding: theme.spacing(1),
-//     },
-// }))(MuiDialogActions);
-
 const useStyles = makeStyles((theme) => ({
     helperText: {
       alignSelf:'flex-end'
-    }
+    },
+    loginBtn:{
+        backgroundColor: '#43AFFF', 
+        color: '#ffffff', 
+        border: '1px solid #43AFFF', 
+        textTransform: 'none', 
+        width: '148px', 
+        height: '46px'
+      },
+      actionRow:{
+        display: 'flex', 
+        justifyContent: 'center', 
+        marginBottom: '10px' 
+      }
   }));
 
 export default function LoginModal(props) {
     const classes = useStyles();
-    const [open, setOpen] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [responseError, setResponseError] = useState({ code: '', message: '' });
 
-    const [inputClass, setInputClass] = useState('input-text');
-
-    //   console.log(props);
-
-
-
-    // const handleLogin = () => {
-    //     setOpen(true);
-    // };
     const handleClose = () => {
             props.onCloseModal(false);
     };
-
-    const handleEmail = (e) => {
-        let inputEmail = e.target.value;
-        setEmail(inputEmail);
-        // if (inputEmail) {
-        //     let emailRegex =
-        //         /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        //     if (emailRegex.test(inputEmail)) {
-        //         setEmail(inputEmail);
-        //         setEmailError('');
-        //     } else {
-        //         setEmail('');
-        //         // setEmailError('Please enter a valid email address');
-        //     }
-        // }
-        // else {
-        //     setEmailError('Please enter your email address');
-        // }
-    }
-
-    const handlePassword = (e) => {
-        setPassword(e.target.value);
-    }
 
     const validateLogin = () => {
 
@@ -130,11 +117,9 @@ export default function LoginModal(props) {
 
     const handleLogin = () => {
         if (!validateLogin()) {
-            console.log("wrong validate", email, password);
             return false;
         }
         else {
-            console.log("inside validate", email, password);
             let apiUrl = API.USER_LOGIN;
             fetch(apiUrl, {
                 method: 'POST',
@@ -149,11 +134,10 @@ export default function LoginModal(props) {
             })
                 .then((response) => response.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.success) {
                         localStorage.setItem("UserInfo", JSON.stringify(result.data));
                         props.onLoggedIn(true);
-                        window.location.href = '/recruiters';
+                        window.location.href = '/recruiters?loggedIn=true';
 
                     }
                     else {
@@ -165,7 +149,7 @@ export default function LoginModal(props) {
                     }
                 })
                 .catch((error) => {
-                    console.log("Err", error);
+                    console.log(error);
                     return false;
                 });
         }
@@ -173,44 +157,33 @@ export default function LoginModal(props) {
 
     return (
         <div>
-            <Dialog maxWidth='sm' fullWidth onClose={handleClose} aria-labelledby="customized-dialog-title" open={open}>
-                <DialogTitle id="customized-dialog-title" onClose={handleClose}>
+            <Dialog maxWidth='sm' fullWidth PaperProps={{style:{borderRadius: 20 }}} onClose={handleClose} aria-labelledby="login-dialog-title" open>
+                <DialogTitle id="login-dialog-title" onClose={handleClose}>
                     Login
                 </DialogTitle>
                 <DialogContent>
                     <Box
-                        // component="form"
-                        // sx={{
-                        //     '& .MuiTextField-root': { m: 1, width: '25ch' },
-                        // }}
                         sx={{
                             display: 'block',
                             alignItems: 'center',
                             '& > :not(style)': { m: 1 }
                         }}
-                    // noValidate
-                    // autoComplete="off"
                     >
-                        {/* <Grid
-                            container
-                            direction="column"
-                            justifyContent="flex-start"
-                        > */}
-
 
                         <label>Email address</label>
                         <div>
                             <FormControl fullWidth sx={{ m: 1 }}>
-                                <TextField
+                                <TextField 
+                                className={classes.cssOutlinedInput}
                                   FormHelperTextProps={{
                                     className: classes.helperText
-                                  }} 
+                                  }}
+                                  autoFocus
                                     placeholder={'Enter your email'}
-                                    // margin={'normal'}
                                     id="email-required"
                                     variant='outlined'
                                     size='small'
-                                    onChange={handleEmail}
+                                    onChange={(e)=>setEmail(e.target.value)}
                                     error={emailError != '' || responseError.message != ''? true : false}
                                     helperText={emailError}
                                 />
@@ -229,22 +202,16 @@ export default function LoginModal(props) {
                                     type='password'
                                     size='small'
                                     variant='outlined'
-                                    onChange={handlePassword}
+                                    onChange={(e)=>setPassword(e.target.value)}
                                     error={passwordError != '' || responseError.message != '' ? true : false}
                                     helperText={passwordError ? passwordError : responseError.message}
-                                // InputLabelProps={{ shrink: true, classes: inputLabelStyles }}
-                                // InputProps={{ classes: inputBaseStyles, disableUnderline: true }}
                                 />
                             </FormControl>
                         </div>
-                        {/* </Grid> */}
                     </Box>
                 </DialogContent>
-                <DialogActions style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }} >
-                    {/* <Button autoFocus onClick={handleLogin} color="primary">
-                        Login
-                    </Button> */}
-                    <Button variant='contained' style={{ backgroundColor: '#43AFFF', color: '#ffffff', border: '1px solid #43AFFF', textTransform: 'none', width: '148px', height: '46px' }} onClick={handleLogin}>Login</Button>
+                <DialogActions className={classes.actionRow} >
+                    <Button variant='contained' className={classes.loginBtn} onClick={handleLogin}>Login</Button>
                 </DialogActions>
             </Dialog>
         </div>

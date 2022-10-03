@@ -2,19 +2,19 @@ import { Box, makeStyles } from '@material-ui/core';
 import { Pagination } from '@material-ui/lab';
 import React from 'react';
 const useStyles=makeStyles((theme)=>({
-    root:{
+    pageContainer:{
         // position:'fixed',
         // bottom:0,
         zIndex:200,
         padding:'10px 80px',
         width:'100%'
     },
-    container:{
-        display:'flex',
-        justifyContent:'center',
-        alignItems:'center',
-        // color:'white'
-    },
+    ul: {
+        "& .MuiPaginationItem-root": {
+          color: "#303F60",
+          backgroundColor:'#43AFFF33'
+        },
+      }
 }))
 
 const CustomPagination=({setPage,currentPage,totalCount,numberOfPages})=>{
@@ -27,8 +27,8 @@ const CustomPagination=({setPage,currentPage,totalCount,numberOfPages})=>{
     
     return(
         <Box display={'flex'} justifyContent={'center'} alignItems={'center'} sx={{margin:'20px 0px'}}>
-            <div className={classes.root}>
-                <Pagination style={{display:'flex', justifyContent:'center'}} 
+            <div className={classes.pageContainer}>
+                <Pagination  classes={{ ul: classes.ul }} style={{display:'flex', justifyContent:'center'}} 
                 count={numberOfPages} 
                 onChange={handlePageChange}
                 variant="outlined" shape="rounded" color='primary'

@@ -1,4 +1,4 @@
-import { Box, Button, Container, Dialog, DialogActions, DialogContent, Grid, IconButton, makeStyles, TextField, Typography, withStyles } from '@material-ui/core';
+import { Box, Button, CircularProgress, Container, Dialog, DialogActions, DialogContent, Grid, IconButton, makeStyles, TextField, Typography, withStyles } from '@material-ui/core';
 import { NoteAddOutlined } from '@material-ui/icons';
 import React, { Component, useEffect, useState } from 'react';
 import API from '../constants/API-Config';
@@ -8,7 +8,7 @@ import AssignmentIcon from '@material-ui/icons/Assignment';
 import CloseIcon from '@material-ui/icons/Close';
 
 const styles = (theme) => ({
-    applicanttitle: {
+    applicantTitle: {
         margin: 0,
         padding: theme.spacing(2),
         paddingBottom:'0px',
@@ -25,7 +25,7 @@ const styles = (theme) => ({
 const DialogTitle = withStyles(styles)((props) => {
     const { children, classes, onClose, ...other } = props;
     return (
-        <MuiDialogTitle disableTypography className={classes.applicanttitle} {...other}>
+        <MuiDialogTitle disableTypography className={classes.applicantTitle} {...other}>
             <Typography variant="h6">{children}</Typography>
             {onClose ? (
                 <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
@@ -50,6 +50,7 @@ const useStyles=makeStyles((theme)=>({
 const ApplicantsModal = (props) => {
     const [totalCount, setTotalCount] = useState(0);
     const [applicantsRecord, setApplicantsRecord] = useState([]);
+    const [isLoading,setisLoading]=useState(false);
     let authToken='';
     const classes=useStyles();
 
@@ -60,6 +61,7 @@ const ApplicantsModal = (props) => {
         let user = JSON.parse(localStorage.getItem('UserInfo'));
         console.log(user);
         authToken=user.token; 
+        setisLoading(true);
         let apiUrl = API.GET_POSTED_JOBS + `/${props.jobId}/candidates`;
         fetch(apiUrl, {
             method: 'GET',
@@ -74,6 +76,7 @@ const ApplicantsModal = (props) => {
             .then((result) => {
                 console.log(result);
                 if(result.success){
+                setisLoading(false);
                 setApplicantsRecord(result.data);
                 setTotalCount(result.data.length);
                 }
@@ -90,6 +93,9 @@ const ApplicantsModal = (props) => {
                 <DialogTitle id="customized-dialog-title" onClose={handleClose}>
                     Applicants for this job
                 </DialogTitle>
+                {
+                    !isLoading ? 
+                    <>
                 <Typography variant='body1' style={{color:'#303F60', paddingLeft:'1.8rem', fontSize:'15px'}}>
                     
                     {
@@ -103,9 +109,6 @@ const ApplicantsModal = (props) => {
                 <Container className={classes.content}>
                     <Box
                         component="form"
-                        // sx={{
-                        //     '& .MuiTextField-root': { m: 1, width: '25ch' },
-                        // }}
                         noValidate
                         autoComplete="off"
                     >
@@ -129,6 +132,15 @@ const ApplicantsModal = (props) => {
                     </Box>
                     </Container>
                 </DialogContent>
+                </>
+                : 
+                <>
+                <Box padding={18} display='flex' alignItems={'center'} flexDirection='column'>
+                <CircularProgress size={50} style={{color:'#43AFFF'}}/>
+                </Box>
+            </>
+
+                    }
             </Dialog>
         </div>
     )
