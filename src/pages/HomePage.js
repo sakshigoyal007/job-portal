@@ -1,7 +1,8 @@
-import { Box, Button, Card, CardContent, Container, Grid, IconButton,makeStyles, Snackbar,Typography } from '@material-ui/core';
-import React, {useEffect, useState } from 'react';
+import { Box, Button, Card, CardContent, Container, Grid, IconButton, makeStyles, Snackbar, Typography, useTheme } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
 import HeaderNav from '../components/HeaderNav';
 import { imageData } from '../constants/ImageData';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme) => ({
     headerNav: {
@@ -12,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     hero: {
-        backgroundImage: `url(/images/HomePageImg.png)`,
+        backgroundImage: `url(/images/HomePageImage.png)`,
         height: "395px",
         position: "relative",
         display: "flex",
@@ -20,10 +21,6 @@ const useStyles = makeStyles((theme) => ({
         backgroundRepeat: "no-repeat",
         backgroundSize: "contain",
         borderRadius: "20px",
-        // [theme.breakpoints.down('sm')]:{
-        //     // width:'300px',
-        //     backgroundImage: `url(HomePageImg.png)`
-        // }
     },
 
     infoContainer: {
@@ -50,19 +47,28 @@ const useStyles = makeStyles((theme) => ({
         width: 200,
         height: 250,
     },
+    flexBox: {
+        [theme.breakpoints.down('md')]: {
+            justifyContent: 'center'
+        }
+    },
+    boxTitle: {
+        paddingBottom: '2rem'
+    },
     startBtn: {
         borderRadius: '5px',
-        backgroundColor: '#43AFFF',
-        color: '#ffffff',
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.secondary.main,
+        margin: '6px',
         border: '1px solid #43AFFF',
         textTransform: 'none',
         width: '148px',
         height: '46px',
-        marginTop: '-6rem',
+        marginBottom: '4rem',
         '&:hover, &:active, &:visited': {
-            backgroundColor: "#43AFFF",
+            backgroundColor: theme.palette.primary.main,
             border: '1px solid #43AFFF',
-         },
+        },
     },
     articleTitle: {
         color: '#303F60',
@@ -70,40 +76,49 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: '40px'
     },
     cardTitle: {
-        color: '#43AFFF',
+        color: theme.palette.primary.main,
         whiteSpace: 'pre-line'
     },
     cardContent: {
         color: '#303F60',
         paddingTop: '29px'
     },
-    imgGrid:{
-        display: 'flex', 
-        justifyContent: 'space-around', 
-        flexWrap: 'wrap' 
+    imgGrid: {
+        display: 'flex',
+        justifyContent: 'space-around',
+        flexWrap: 'wrap'
     },
-    notifier:{
-        backgroundColor: 'white', 
-        height: 'auto', 
-        lineHeight: '28px', 
-        whiteSpace: 'pre-line'
+    notifier: {
+        backgroundColor: 'white',
+        height: 'auto',
+        lineHeight: '28px',
+        whiteSpace: 'pre-line',
+        "&.MuiSnackbar-anchorOriginTopRight": {
+            top: '5rem',
+            right: '5rem'
+        }
+    },
+    iconBtn: {
+        '&:focus': {
+            outline: 'none'
+        }
     }
 }));
 
 const HomePage = () => {
     const classes = useStyles();
-    const [notifier,setNotifier]=useState(false);
+    const [notifier, setNotifier] = useState(false);
 
     useEffect(() => {
         let user = JSON.parse(localStorage.getItem('UserInfo'));
-        if(user)
-            window.location.href='/recruiters';
+        if (user)
+            window.location.href = '/recruiters';
         if (window.location.search.includes('logout=true')) {
-                setNotifier(true);
-            }
+            setNotifier(true);
+        }
     }, []);
 
-   const handleCloseNotifier = () => {
+    const handleCloseNotifier = () => {
         setNotifier(false);
     };
 
@@ -111,12 +126,13 @@ const HomePage = () => {
         <>
             <HeaderNav />
             <Box sx={{ mt: '30px', p: '0 180px' }} display={'flex'} flexDirection='column' justifyContent={'space-around'}>
-                <Box display={'flex'} justifyContent='space-between'>
-                    <Box display={'flex'} flexWrap='wrap' flexDirection={'column'} justifyContent='space-evenly' >
-                        <Typography variant='h4' style={{ color: '#ffffff' }}>Welcome to<br />My<span style={{ color: '#43AFFF' }}>Jobs</span></Typography>
+                <Box className={classes.flexBox} display={'flex'} flexWrap='wrap' justifyContent='space-between'>
+                    <Box display={'flex'} flexWrap='wrap' flexDirection='column' justifyContent='center'>
+                        <Typography variant='h3' color='secondary'>Welcome to</Typography>
+                        <Typography variant='h3' color='secondary' className={classes.boxTitle}>My<span style={{ color: '#43AFFF' }}>Jobs</span></Typography>
                         <Button variant='contained' className={classes.startBtn}>Get Started</Button>
                     </Box>
-                    <Box className={classes.hero}/>
+                    <Box className={classes.hero} />
                 </Box>
                 <Container className={classes.infoContainer} maxWidth={'lg'}>
                     <Typography className={classes.articleTitle} variant='h5'>Why Us</Typography>
@@ -174,23 +190,27 @@ const HomePage = () => {
                 </Container>
             </Box>
             {
-                    notifier &&
-                    <Snackbar
-                        className={classes.notifier}
-                        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                        onClose={handleCloseNotifier}
-                        title={'Login'}
-                        message={"Logout\nYou have successfully logged out."}
-                        open
-                        action={[
-                            <IconButton
-                             key={'close'}
-                                aria-label='Close'
-                                color='black'
-                                onClick={handleCloseNotifier}>x</IconButton>
-                        ]}
-                    />
-                }
+                notifier &&
+                <Snackbar
+                    className={classes.notifier}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    onClose={handleCloseNotifier}
+                    title={'Login'}
+                    message={
+                        <>
+                            <h5 style={{ color: '#43AFFF' }}>{'Logout'}</h5>
+                            <p>You have successfully logged out.</p>
+                        </>
+                    }
+                    open
+                    action={[
+                        <IconButton className={classes.iconBtn}
+                            key={'close'}
+                            aria-label='Close'
+                            onClick={handleCloseNotifier}><CloseIcon /></IconButton>
+                    ]}
+                />
+            }
         </>
     );
 }

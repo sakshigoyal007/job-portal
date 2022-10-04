@@ -11,21 +11,6 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-between',
         flexDirection: 'column'
     },
-    applicationBtn: {
-        display: 'inline-block',
-        backgroundColor: '#43AFFF33',
-        color: '#303f60',
-        borderRadius: '5px',
-        textTransform: 'none',
-        height: '32px',
-        whiteSpace: 'nowrap',
-        '&:hover': {
-            backgroundColor: "#43AFFF33",
-        },
-        [theme.breakpoints.down('md')]: {
-            display: 'block',
-        },
-    },
     jobCardTitle: {
         overflow: 'hidden',
         color: '#303F60',
@@ -53,6 +38,21 @@ const useStyles = makeStyles((theme) => ({
         marginRight: '10px',
         maxWidth: '100px'
     },
+    applicationBtn: {
+        display: 'inline-block',
+        backgroundColor: theme.palette.primary.dark,
+        color: '#303f60',
+        borderRadius: '5px',
+        textTransform: 'none',
+        height: '32px',
+        whiteSpace: 'nowrap',
+        '&:hover': {
+            backgroundColor: theme.palette.primary.dark,
+        },
+        [theme.breakpoints.down('md')]: {
+            display: 'block',
+        }
+    }
 
 }));
 
@@ -85,7 +85,7 @@ const PostedJobs = (props) => {
                 </CardContent>
                 <CardActions className={classes.cardActionCss}>
                     <Box display={'flex'}>
-                        <LocationOnIcon style={{ color: '#43AFFF' }} />
+                        <LocationOnIcon color='primary' />
                         <Typography className={classes.location} noWrap title={props.location} >{props.location}</Typography>
                     </Box>
                     <Button size='small' variant='contained'

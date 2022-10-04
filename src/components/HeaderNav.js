@@ -1,7 +1,7 @@
-import React, {useState } from 'react';
-import { Typography,Button, IconButton, Menu, MenuItem, Tooltip, AppBar, Toolbar, makeStyles, Divider } from '@material-ui/core';
-import { AccountCircle } from '@material-ui/icons';
+import React, { useState } from 'react';
+import { Typography, Button, IconButton, Menu, MenuItem, Tooltip, AppBar, Toolbar, makeStyles, Divider, Avatar } from '@material-ui/core';
 import LoginModal from './LoginModal';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 
 const useStyles = makeStyles((theme) => ({
     headerNav: {
@@ -19,17 +19,26 @@ const useStyles = makeStyles((theme) => ({
             display: 'flex',
         },
     },
-    headerBtn:{
-        backgroundColor: '#43AFFF33', 
-        color: '#ffffff', 
-        border: '1px solid #43AFFF', 
-        textTransform: 'none', 
-        width: '148px', 
-        height: '46px' ,
+    headerBtn: {
+        backgroundColor: theme.palette.primary.dark,
+        color: theme.palette.secondary.main,
+        border: '1px solid #43AFFF',
+        textTransform: 'none',
+        width: '148px',
+        height: '46px',
         '&:hover, &:active, &:visited': {
-            backgroundColor: "#43AFFF",
+            backgroundColor: theme.palette.primary.main,
             border: '1px solid #43AFFF',
-         },
+        },
+    },
+    iconBtn: {
+        '&:focus': {
+            outline: 'none'
+        }
+    },
+    profileAvatar: {
+        backgroundColor: '#D9EFFF',
+        color: '#303F60'
     }
 
 }));
@@ -39,6 +48,7 @@ const HeaderNav = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('UserInfo') ? true : false);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [userAnchorEle, setUserAnchorEle] = useState(null);
+    let username = localStorage.getItem('UserInfo') ? JSON.parse(localStorage.getItem('UserInfo')).name : "";
 
     const handleOpenUserMenu = (event) => {
         setUserAnchorEle(event.currentTarget);
@@ -58,16 +68,17 @@ const HeaderNav = () => {
             <div className='App'>
                 <AppBar className={classes.headerNav} position='static'>
                     <Toolbar style={{ padding: '0' }}>
-                        <Typography className={classes.headerTitle} variant='h6' noWrap>My<span style={{ color: '#43AFFF' }}>Jobs</span>
+                        <Typography className={classes.headerTitle} color='secondary' variant='h6' noWrap>My<span style={{ color: '#43AFFF' }}>Jobs</span>
                         </Typography>
                         {
                             !isLoggedIn ?
-                                    <Button variant='contained' className={classes.headerBtn} onClick={() => setShowLoginModal(true)}>Login</Button>
+                                <Button variant='contained' className={classes.headerBtn} onClick={() => setShowLoginModal(true)}>Login</Button>
                                 :
                                 <>
                                     <Tooltip title="Open Profile">
-                                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                            <AccountCircle />
+                                        <IconButton className={classes.iconBtn} onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                            <Avatar className={classes.profileAvatar}>{username.charAt(0).toUpperCase()}</Avatar>
+                                            <ArrowDropDownIcon color='secondary' />
                                         </IconButton>
                                     </Tooltip>
                                     <Menu

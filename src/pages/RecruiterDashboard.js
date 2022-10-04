@@ -6,6 +6,8 @@ import API from '../constants/API-Config';
 import HomeIcon from '@material-ui/icons/Home';
 import DescriptionIcon from '@material-ui/icons/Description';
 import PostedJobs from '../components/PostedJobs';
+import CloseIcon from '@material-ui/icons/Close';
+import ErrorModal from '../components/ErrorrModal';
 
 const styles = theme => ({
     jobsGrid: {
@@ -21,13 +23,13 @@ const styles = theme => ({
     postBtn: {
         borderReadius: '5px',
         marginTop: '40px',
-        color: '#FFFFFF',
-        backgroundColor: '#43AFFF',
+        color: theme.palette.secondary.main,
+        backgroundColor: theme.palette.primary.main,
         textTransform: 'none',
         width: '148px',
         height: '46px',
         '&:hover, &:active': {
-            backgroundColor: "#43AFFF",
+            backgroundColor: theme.palette.primary.main,
             border: '1px solid #43AFFF',
         },
     },
@@ -39,7 +41,16 @@ const styles = theme => ({
         backgroundColor: 'white',
         height: 'auto',
         lineHeight: '28px',
-        whiteSpace: 'pre-line'
+        whiteSpace: 'pre-line',
+        "&.MuiSnackbar-anchorOriginTopRight": {
+            top: '5rem',
+            right: '5rem'
+        }
+    },
+    iconBtn: {
+        '&:focus': {
+            outline: 'none'
+        }
     }
 });
 
@@ -54,6 +65,8 @@ class RecruiterDashboard extends Component {
             numberOfPages: 1,
             isLoading: false,
             showNotifier: false,
+            showErrorModal: false,
+            ErrorResponse: { code: '', message: '' }
         }
     }
 
@@ -91,22 +104,37 @@ class RecruiterDashboard extends Component {
         })
             .then((response) => response.json())
             .then((result) => {
-                let totalPages = Math.ceil(result.data.metadata.count / result.data.metadata.limit);
-                this.setState({
-                    isLoading: false,
-                    jobsRecord: result.data.data,
-                    totalCount: result.data.metadata.count,
-                    numberOfPages: totalPages
-                });
+                if (result.success) {
+                    let totalPages = Math.ceil(result.data.metadata.count / result.data.metadata.limit);
+                    this.setState({
+                        isLoading: false,
+                        jobsRecord: result.data.data,
+                        totalCount: result.data.metadata.count,
+                        numberOfPages: totalPages
+                    });
+                }
+                else
+                    return Promise.reject(result);
             })
             .catch((error) => {
-                console.log(error);
+                const resultErr = {
+                    code: error.code,
+                    message: error.message
+                };
+                this.setState({
+                    isLoading: false,
+                    showErrorModal: true,
+                    ErrorResponse: resultErr
+                })
             });
     }
 
     handleCloseNotifier = () => {
         this.setState({ showNotifier: false });
     };
+    closeErrorModal = () => {
+        this.setState({ showErrorModal: false, ErrorResponse: { code: '', message: '' } });
+    }
 
     render() {
         const records = this.state.jobsRecord;
@@ -114,13 +142,13 @@ class RecruiterDashboard extends Component {
         return (
             <>
                 <HeaderNav />
-                <Box color="#ffffff" sx={{ mt: '12px', p: '0 180px' }} display={'flex'} flexDirection='column' justifyContent={'space-evenly'}>
+                <Box sx={{ mt: '12px', p: '0 180px' }} display={'flex'} flexDirection='column' justifyContent={'space-evenly'}>
                     <Box display={'flex'}>
-                        <HomeIcon style={{ color: '#ffffff' }} />
-                        <span>Home</span>
+                        <HomeIcon color='secondary' />
+                        <span style={{ color: "#ffffff" }}>Home</span>
                     </Box>
 
-                    <Typography variant='h4' style={{ padding: '24px 0' }} >Jobs posted by you</Typography>
+                    <Typography variant='h4' color='secondary' style={{ padding: '26px 0' }} >Jobs posted by you</Typography>
                     {
                         !this.state.isLoading ?
 
@@ -136,7 +164,6 @@ class RecruiterDashboard extends Component {
                                                 </Grid>
                                                 <CustomPagination setPage={this.paginationChange}
                                                     currentPage={this.state.currentPage}
-                                                    totalCount={this.state.totalCount}
                                                     numberOfPages={this.state.numberOfPages} />
                                             </>
                                             :
@@ -155,7 +182,7 @@ class RecruiterDashboard extends Component {
                             :
                             <>
                                 <Box p={18} display='flex' alignItems={'center'} flexDirection='column'>
-                                    <CircularProgress size={50} style={{ color: '#43AFFF' }} />
+                                    <CircularProgress color='primary' size={50} />
                                 </Box>
                             </>
 
@@ -168,20 +195,30 @@ class RecruiterDashboard extends Component {
                         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                         onClose={this.handleCloseNotifier}
                         title={'Login'}
-                        message={"Login\nYou have successfully logged in"}
-                        open
+                        message={
+                            <>
+                                <h5 style={{ color: '#43AFFF' }}>{'Login'}</h5>
+                                <p>You have successfully logged in.</p>
+                            </>
+                        }
+                        open={this.state.showNotifier}
                         action={[
-                            <IconButton key={'close'}
+                            <IconButton className={classes.iconBtn} key={'close'}
                                 aria-label='Close'
-                                onClick={this.handleCloseNotifier}>x</IconButton>
+                                onClick={this.handleCloseNotifier}><CloseIcon /></IconButton>
                         ]}
                     />
                 }
-
+                <ErrorModal
+                    modalOpen={this.state.showErrorModal}
+                    errorText={this.state.ErrorResponse.message}
+                    handleErrorOk={this.closeErrorModal}
+                    handleClose={this.closeErrorModal}
+                />
             </>
 
         );
     }
 }
 
-export default withStyles(styles)(RecruiterDashboard);
+export default withStyles(styles, { withTheme: true })(RecruiterDashboard);

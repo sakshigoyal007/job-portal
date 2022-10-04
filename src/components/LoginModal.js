@@ -7,7 +7,7 @@ import MuiDialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import { Box, DialogActions, FormControl,TextField } from '@material-ui/core';
+import { Box, DialogActions, FormControl, TextField } from '@material-ui/core';
 
 import API from "../constants/API-Config";
 
@@ -21,17 +21,10 @@ const styles = (theme) => ({
         right: theme.spacing(1),
         top: theme.spacing(1),
         color: theme.palette.grey[500],
-    },
-    cssOutlinedInput: {
-        '& .MuiOutlinedInput-root': {
-            '&.Mui-focused fieldset': {
-                borderColor: 'green',
-              },
-            // .Mui-focused .MuiOutlinedInput-notchedOutline': {
-            //     borderColor: 'orange',
-            //   }  
+        '&:focus': {
+            outline: 'none'
         }
-      }
+    },
 });
 
 
@@ -58,26 +51,26 @@ const DialogContent = withStyles((theme) => ({
 
 const useStyles = makeStyles((theme) => ({
     helperText: {
-      alignSelf:'flex-end'
+        alignSelf: 'flex-end'
     },
-    loginBtn:{
-        backgroundColor: '#43AFFF', 
-        color: '#ffffff', 
-        border: '1px solid #43AFFF', 
-        textTransform: 'none', 
-        width: '148px', 
+    loginBtn: {
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.secondary.main,
+        border: '1px solid #43AFFF',
+        textTransform: 'none',
+        width: '148px',
         height: '46px',
         '&:hover, &:active, &:visited': {
-            backgroundColor: "#43AFFF",
+            backgroundColor: theme.palette.primary.main,
             border: '1px solid #43AFFF',
-         },
-      },
-      actionRow:{
-        display: 'flex', 
-        justifyContent: 'center', 
-        marginBottom: '10px' 
-      }
-  }));
+        },
+    },
+    actionRow: {
+        display: 'flex',
+        justifyContent: 'center',
+        marginBottom: '10px'
+    }
+}));
 
 export default function LoginModal(props) {
     const classes = useStyles();
@@ -88,7 +81,7 @@ export default function LoginModal(props) {
     const [responseError, setResponseError] = useState({ code: '', message: '' });
 
     const handleCloseModal = () => {
-            props.onCloseModal(false);
+        props.onCloseModal(false);
     };
 
     const validateLogin = () => {
@@ -150,7 +143,6 @@ export default function LoginModal(props) {
                     }
                 })
                 .catch((error) => {
-                    console.log(error);
                     return false;
                 });
         }
@@ -158,7 +150,7 @@ export default function LoginModal(props) {
 
     return (
         <div>
-            <Dialog maxWidth='sm' fullWidth PaperProps={{style:{borderRadius: 20 }}} onClose={handleCloseModal} aria-labelledby="login-dialog-title" open>
+            <Dialog maxWidth='sm' fullWidth PaperProps={{ style: { borderRadius: 20 } }} onClose={handleCloseModal} aria-labelledby="login-dialog-title" open>
                 <DialogTitle id="login-dialog-title" onClose={handleCloseModal}>
                     Login
                 </DialogTitle>
@@ -174,18 +166,17 @@ export default function LoginModal(props) {
                         <label>Email address</label>
                         <div>
                             <FormControl fullWidth sx={{ m: 1 }}>
-                                <TextField 
-                                className={classes.cssOutlinedInput}
-                                  FormHelperTextProps={{
-                                    className: classes.helperText
-                                  }}
-                                  autoFocus
+                                <TextField
+                                    FormHelperTextProps={{
+                                        className: classes.helperText
+                                    }}
+                                    autoFocus
                                     placeholder={'Enter your email'}
                                     id="email-required"
                                     variant='outlined'
                                     size='small'
-                                    onChange={(e)=>setEmail(e.target.value)}
-                                    error={emailError != '' || responseError.message != ''? true : false}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    error={emailError != '' || responseError.message != '' ? true : false}
                                     helperText={emailError}
                                 />
                             </FormControl>
@@ -195,15 +186,15 @@ export default function LoginModal(props) {
                         <div>
                             <FormControl fullWidth sx={{ m: 1 }}>
                                 <TextField
-                                FormHelperTextProps={{
-                                    className: classes.helperText
-                                  }}   
-                                  id="password-required"
+                                    FormHelperTextProps={{
+                                        className: classes.helperText
+                                    }}
+                                    id="password-required"
                                     placeholder={'Enter your password'}
                                     type='password'
                                     size='small'
                                     variant='outlined'
-                                    onChange={(e)=>setPassword(e.target.value)}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     error={passwordError != '' || responseError.message != '' ? true : false}
                                     helperText={passwordError ? passwordError : responseError.message}
                                 />

@@ -5,6 +5,7 @@ import ApplicantCard from './ApplicantCard';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import CloseIcon from '@material-ui/icons/Close';
+import ErrorModal from './ErrorrModal';
 
 const styles = (theme) => ({
     applicantTitle: {
@@ -18,6 +19,9 @@ const styles = (theme) => ({
         right: theme.spacing(1),
         top: theme.spacing(1),
         color: theme.palette.grey[500],
+        '&:focus': {
+            outline: 'none'
+        }
     }
 });
 
@@ -58,9 +62,6 @@ const useStyles = makeStyles((theme) => ({
         color: '#303F60',
         opacity: '0.8'
     },
-    loader: {
-        color: '#43AFFF'
-    }
 }))
 
 
@@ -70,6 +71,10 @@ const ApplicantsModal = (props) => {
     const [totalCount, setTotalCount] = useState(0);
     const [applicantsRecord, setApplicantsRecord] = useState([]);
     const [isLoading, setisLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [responseError, setResponseError] = useState({ code: '', message: '' });
+    const [showErrorModal, setShowErrorModal] = useState(false);
+
     let authToken = '';
 
     const handleCloseModal = () => props.onCloseModal(false);
@@ -91,20 +96,34 @@ const ApplicantsModal = (props) => {
             .then((response) => response.json())
             .then((result) => {
                 if (result.success) {
+                    setShowModal(true);
                     setisLoading(false);
                     setApplicantsRecord(result.data);
                     setTotalCount(result.data.length);
                 }
+                else {
+                    return Promise.reject(result);
+                }
             })
             .catch((error) => {
-                console.log("Err", error);
+                const resultErr = {
+                    code: error.code,
+                    message: error.message
+                };
+                setisLoading(false);
+                setResponseError(resultErr);
+                setShowErrorModal(true);
             });
     }, []);
 
+    const closeErrorModal = () => {
+        setShowErrorModal(false);
+        setResponseError({ code: '', message: '' });
+    }
 
     return (
         <div>
-            <Dialog maxWidth='sm' fullWidth onClose={handleCloseModal} aria-labelledby="applicants-dialog-title" open>
+            <Dialog maxWidth='sm' fullWidth onClose={handleCloseModal} aria-labelledby="applicants-dialog-title" open={showModal}>
                 <DialogTitle id="applicants-dialog-title" onClose={handleCloseModal}>
                     Applicants for this job
                 </DialogTitle>
@@ -151,12 +170,18 @@ const ApplicantsModal = (props) => {
                         :
                         <>
                             <Box padding={18} display='flex' alignItems={'center'} flexDirection='column'>
-                                <CircularProgress size={50} className={classes.loader} />
+                                <CircularProgress size={50} color='primary' />
                             </Box>
                         </>
 
                 }
             </Dialog>
+            <ErrorModal
+                modalOpen={showErrorModal}
+                errorText={responseError.message}
+                handleErrorOk={closeErrorModal}
+                handleClose={closeErrorModal}
+            />
         </div>
     )
 }
